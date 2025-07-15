@@ -27,7 +27,7 @@ export default function Countdown({ targetDate }: { targetDate: Date }) {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="flex justify-center gap-6 md:gap-10 my-8 font-sans"
+      className="flex justify-center gap-2 md:gap-10 my-8 font-sans"
     >
       {[
         { label: 'Days', value: timeLeft.days },
@@ -37,9 +37,9 @@ export default function Countdown({ targetDate }: { targetDate: Date }) {
       ].map(({ label, value }) => (
         <div
           key={label}
-          className="bg-white/60 rounded-3xl min-w-[90px] md:min-w-[120px] px-2 py-6 shadow-lg flex flex-col items-center"
+          className="bg-white/60 rounded-3xl min-w-[90px] md:min-w-[120px] p-2 md:px-2 md:py-6 shadow-lg flex flex-col items-center"
         >
-          <span className="text-3xl md:text-4xl font-bold text-[#2d1a2d] tracking-wider">{String(value).padStart(2, '0')}</span>
+          <span className="text-xl md:text-4xl font-bold text-[#2d1a2d] tracking-wider">{String(value).padStart(2, '0')}</span>
           <span className="text-base md:text-lg mt-2 text-[#6e4a7e] font-medium">{label}</span>
         </div>
       ))}
