@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useState, createContext } from "react";
+import { useState, createContext } from "react";
 import PlaylistSection from "@/components/Guest/PlaylistSection";
 import PhotoUploadSection from "@/components/Guest/PhotoUploadSection";
 import GallerySection from "@/components/Guest/GallerySection";
