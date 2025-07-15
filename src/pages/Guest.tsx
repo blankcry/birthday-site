@@ -5,11 +5,18 @@ import PhotoUploadSection from "@/components/Guest/PhotoUploadSection";
 import GallerySection from "@/components/Guest/GallerySection";
 import { AnimatePresence, motion } from "framer-motion";
 
-export const ContributorContext = createContext<{ name: string }>({ name: "" });
+// Combined context for contributor name and gallery refresh
+export const GuestContext = createContext<{
+  name: string;
+  refreshGallery: () => void;
+  galleryRefresh: number;
+}>({ name: "", refreshGallery: () => {}, galleryRefresh: 0 });
 
 function Guest() {
   const [contributorName, setContributorName] = useState("");
   const [input, setInput] = useState("");
+  const [galleryRefresh, setGalleryRefresh] = useState(0);
+  const refreshGallery = () => setGalleryRefresh((r) => r + 1);
 
   return (
     <AnimatePresence mode="wait">
@@ -46,16 +53,16 @@ function Guest() {
           </div>
         </motion.div>
       ) : (
-        <ContributorContext.Provider value={{ name: contributorName }}>
+        <GuestContext.Provider value={{ name: contributorName, refreshGallery, galleryRefresh }}>
           <motion.div
             key="main"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="min-h-screen bg-gradient-to-br from-pink-300 via-pink-50 to-pink-500 flex flex-col items-center px-2 sm:px-6 md:px-12 lg:px-36"
+            className="min-h-screen bg-gradient-to-br from-pink-300 via-pink-50 to-pink-500 flex flex-col items-center px-6 md:px-12 lg:px-36"
           >
-            <span className="text-xl md:text-4xl font-extrabold text-center text-[#2d1a2d] mb-2 w-full">
+            <span className="text-xl md:text-4xl font-extrabold text-center text-[#2d1a2d] mt-4 w-full">
               Help make Preci’s day special!
             </span>
             <p className="text-center text-base md:text-lg text-[#6e4a7e] mb-8">
@@ -66,7 +73,7 @@ function Guest() {
             <PlaylistSection />
             <GallerySection />
           </motion.div>
-        </ContributorContext.Provider>
+        </GuestContext.Provider>
       )}
     </AnimatePresence>
   );

@@ -1,11 +1,11 @@
 import { useState, useContext } from "react";
-import { ContributorContext } from "@/pages/Guest";
+import { GuestContext } from "@/pages/Guest";
 import { supabase } from "@/api/supabaseClient";
 
 function PhotoUploadSection() {
   const [photo, setPhoto] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const { name } = useContext(ContributorContext);
+  const { name, refreshGallery } = useContext(GuestContext);
   const [uploading, setUploading] = useState(false); // for file upload
   const [inserting, setInserting] = useState(false); // for db insert
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +57,7 @@ function PhotoUploadSection() {
     try {
       const slug = slugify(name);
       const { error: insertError } = await supabase.from("guest_uploads").insert([
-        { name, slug, caption: message, photo_url: url },
+        { name: slug, caption: message, photo_url: url },
       ]);
       if (insertError) throw insertError;
       setSuccess(true);
@@ -65,6 +65,7 @@ function PhotoUploadSection() {
       setMessage("");
       setPhotoUrl(null);
       setFileName(null);
+      refreshGallery(); // trigger gallery refresh
     } catch (err: any) {
       setError(err.message || "An error occurred. Please try again.");
     } finally {
@@ -126,9 +127,22 @@ function PhotoUploadSection() {
             </div>
           ) : (
             <>
-              <span className="text-5xl md:text-6xl mb-2">⬆️</span>
-              <span className="font-semibold text-base md:text-lg text-teal-900">
-                UPLOAD
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-10 h-10 md:w-12 md:h-12 text-pink-400 mb-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                />
+              </svg>
+              <span className="font-medium text-xs md:text-sm text-pink-400 tracking-wide">
+                Upload Photo
               </span>
             </>
           )}

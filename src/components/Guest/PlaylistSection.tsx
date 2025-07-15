@@ -1,6 +1,6 @@
 import SpotifySDK from "@/api/spotifyClient";
 import { useEffect, useRef, useState, useContext, useCallback } from "react";
-import { ContributorContext } from "@/pages/Guest";
+import { GuestContext } from "@/pages/Guest";
 import { supabase } from "@/api/supabaseClient";
 
 interface PlaylistContributorI {
@@ -13,7 +13,7 @@ interface PlaylistContributorI {
 
 function PlaylistSection() {
   const playlistId = "16EaYXNEuGo5886td84PBJ";
-  const { name } = useContext(ContributorContext);
+  const { name } = useContext(GuestContext);
   const [playlist, setPlaylist] = useState<{
     name: string;
     art: string;
