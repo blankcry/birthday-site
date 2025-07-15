@@ -7,7 +7,7 @@ import type { Container, ISourceOptions } from "@tsparticles/engine";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const BIRTHDAY_DATE = new Date("2025-07-15T00:00:00"); // Change as needed
+  const BIRTHDAY_DATE = new Date("2025-07-20T00:00:00"); // Change as needed
   const [init, setInit] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -114,6 +114,11 @@ function Home() {
         </div>
       )}
       <main className="relative z-10 w-full h-full px-4 py-8 text-center">
+        <img
+          src="/birthday-cake.svg"
+          alt="Birthday Cake Logo"
+          className="mx-auto mb-4 w-20 h-20 drop-shadow-lg"
+        />
         <span className="text-xl md:text-5xl font-extrabold mb-6 text-[#2d1a2d] tracking-wide drop-shadow-[0_2px_12px_rgba(255,246,255,0.4)]">
           Countdown to Preci's Day 🎊🎊
         </span>

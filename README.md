@@ -1,4 +1,6 @@
-# React + TypeScript + Vite
+# Birthday Wishes
+
+A web app to send and celebrate birthday wishes! Now featuring a custom birthday cake logo.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
