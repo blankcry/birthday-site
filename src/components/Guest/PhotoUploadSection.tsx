@@ -11,7 +11,6 @@ function PhotoUploadSection() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null); // keep uploaded photo url
-  const [fileName, setFileName] = useState<string | null>(null); // keep uploaded file name
 
   // Utility to slugify contributor name
   function slugify(str: string) {
@@ -30,7 +29,6 @@ function PhotoUploadSection() {
     try {
       const fileExt = photo.name.split('.').pop();
       const generatedFileName = `${Date.now()}-${name.replace(/\s+/g, "-")}.${fileExt}`;
-      setFileName(generatedFileName);
       const { error: uploadError } = await supabase.storage
         .from("guestphotos")
         .upload(generatedFileName, photo, { upsert: false });
@@ -43,7 +41,6 @@ function PhotoUploadSection() {
     } catch (err: any) {
       setError(err.message || "Photo upload failed. Please try again.");
       setPhotoUrl(null);
-      setFileName(null);
       return null;
     } finally {
       setUploading(false);
@@ -64,7 +61,6 @@ function PhotoUploadSection() {
       setPhoto(null);
       setMessage("");
       setPhotoUrl(null);
-      setFileName(null);
       refreshGallery(); // trigger gallery refresh
     } catch (err: any) {
       setError(err.message || "An error occurred. Please try again.");
@@ -154,7 +150,6 @@ function PhotoUploadSection() {
             onChange={(e) => {
               setPhoto(e.target.files?.[0] || null);
               setPhotoUrl(null);
-              setFileName(null);
               setSuccess(false);
               setError(null);
             }}
