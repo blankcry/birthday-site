@@ -19,20 +19,20 @@ const mockGallery = [
 
 function GallerySection() {
   return (
-    <section className="bg-white/80 rounded-2xl shadow-lg p-6 border border-peach-100">
+    <section className="bg-white/80 rounded-2xl shadow-lg p-4 md:p-6 border border-peach-100 w-full mb-6 md:mb-10">
       <div className="font-semibold text-lg mb-3">Guest Gallery</div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         {mockGallery.map((photo) => (
           <div
             key={photo.id}
-            className="flex flex-col items-center bg-peach-50 rounded-xl p-3 shadow border border-peach-100"
+            className="flex flex-col items-center bg-peach-50 rounded-xl p-2 md:p-3 shadow border border-peach-100"
           >
             <img
               src={photo.url}
               alt="Guest"
-              className="w-full h-40 object-cover rounded-lg mb-2"
+              className="w-full h-32 md:h-40 object-cover rounded-lg mb-2"
             />
-            <div className="text-xs text-gray-600 text-center">
+            <div className="text-[11px] md:text-xs text-gray-600 text-center">
               {photo.caption || ""}
             </div>
           </div>

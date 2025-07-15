@@ -3,6 +3,14 @@ import { useEffect, useRef, useState, useContext, useCallback } from "react";
 import { ContributorContext } from "@/pages/Guest";
 import { supabase } from "@/api/supabaseClient";
 
+interface PlaylistContributorI {
+  track_id: string;
+  track_name: string;
+  artist_name: string;
+  album_art_url: string;
+  contributor_name: string;
+}
+
 function PlaylistSection() {
   const playlistId = "16EaYXNEuGo5886td84PBJ";
   const { name } = useContext(ContributorContext);
@@ -15,7 +23,9 @@ function PlaylistSection() {
       artist: string;
     }>;
   } | null>(null);
-  const [error, setError] = useState("");
+  const [contributors, setContributors] = useState<
+    PlaylistContributorI[] | null
+  >(null);
   const [songQuery, setSongQuery] = useState("");
   const [songs, setSongs] = useState<
     {
@@ -28,6 +38,7 @@ function PlaylistSection() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [loadingPlaylist, setLoadingPlaylist] = useState(false);
+  const [addingPlaylist, setAddingPlaylist] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (!songQuery) {
@@ -76,27 +87,34 @@ function PlaylistSection() {
         })),
       });
     } catch (error: any) {
-      setError(error.message);
+      console.error(error.message);
     } finally {
       setLoadingPlaylist(false);
+    }
+  }, []);
+  const fetchPlaylistContributors = useCallback(async () => {
+    try {
+      const { data } = await supabase.from("playlist_suggestions").select("*");
+      console.log(data);
+      setContributors(data);
+    } catch (error: any) {
+      console.error(error);
     }
   }, []);
 
   useEffect(() => {
     fetchPlaylist();
-  }, [fetchPlaylist]);
+    fetchPlaylistContributors();
+  }, [fetchPlaylist, fetchPlaylistContributors]);
 
   const handleAddtoPlaylist = async (song: (typeof songs)[0]) => {
     if (!playlist) {
       return;
     }
-    setError("");
-    // Using supabase add the song to the "playlist_suggestions" table
-    // The payload would include track_id, track_name, artist_name, album_art_url and contributor name
-    const { error: supabaseError } = await supabase
-      .from("playlist_suggestions")
-      .insert([
-        {
+    setAddingPlaylist(true);
+    try {
+      await supabase.functions.invoke("spotify-api", {
+        body: {
           track_id: song.id,
           track_name: song.name,
           artist_name: song.artist,
@@ -106,34 +124,26 @@ function PlaylistSection() {
             .map((part) => part.toLocaleLowerCase())
             .join("-"),
         },
-      ]);
-    if (supabaseError) {
-      setError("Failed to suggest song: " + supabaseError.message);
-      return;
-    }
-    // Add to Spotify playlist
-    try {
-      await SpotifySDK.playlists.addItemsToPlaylist(playlistId, [
-        `spotify:track:${song.id}`,
-      ]);
-      setError("Song suggestion submitted and added to playlist! 🎉");
-    } catch (spotifyError: any) {
-      setError(
+      });
+    } catch (error: any) {
+      console.error(
         "Suggested, but failed to add to Spotify playlist: " +
-          (spotifyError.message || spotifyError.toString())
+          (error.message || error.toString())
       );
     } finally {
+      setAddingPlaylist(false);
       fetchPlaylist();
     }
   };
+
   return (
-    <section className="flex gap-2 justify-between w-full">
-      <div className="bg-white/80 rounded-2xl shadow-lg p-6 mb-10 border border-purple-100 max-w-1/2 w-full">
+    <section className="flex flex-col md:flex-row gap-4 md:gap-6 justify-between w-full">
+      <div className="bg-white/80 rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-10 border border-purple-100 w-full md:max-w-[55%]">
         <div className="font-semibold text-lg mb-3">
           Contribute to her custom playlist
         </div>
         <input
-          className="w-full rounded-xl border border-purple-200 bg-purple-50 p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-200"
+          className="w-full rounded-xl border border-purple-200 bg-purple-50 p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-200 text-sm md:text-base"
           placeholder="Search for a song or artist..."
           value={songQuery}
           onChange={(e) => setSongQuery(e.target.value)}
@@ -147,65 +157,87 @@ function PlaylistSection() {
               No results found.
             </div>
           )}
-          {songs.map((song) => (
-            <div
-              key={song.id}
-              className="flex items-center gap-3 bg-purple-50 rounded-xl px-3 py-2"
-            >
-              <img
-                src={
-                  song.albumArt ||
-                  "https://via.placeholder.com/40x40.png?text=🎵"
-                }
-                alt="Album Art"
-                className="w-10 h-10 rounded-lg object-cover border border-purple-200"
-              />
-              <div className="flex-1 text-left">
-                <div className="font-semibold text-sm">{song.name}</div>
-                <div className="text-xs text-purple-500">{song.artist}</div>
-              </div>
-              <button
-                className="cursor-pointer bg-pink-300 hover:bg-pink-400 text-white font-semibold px-4 py-1 rounded-full text-xs shadow transition"
-                onClick={() => handleAddtoPlaylist(song)}
+          {songs.map((song) => {
+            const isAdded =
+              contributors?.some((c) => c.track_id === song.id) ?? false;
+            return (
+              <div
+                key={song.id}
+                className="flex items-center gap-2 md:gap-3 bg-purple-50 rounded-xl px-2 md:px-3 py-2"
               >
-                Add to playlist
-              </button>
-            </div>
-          ))}
+                <img
+                  src={
+                    song.albumArt ||
+                    "https://via.placeholder.com/40x40.png?text="
+                  }
+                  alt="Album Art"
+                  className="w-10 h-10 rounded-lg object-cover border border-purple-200 flex-shrink-0"
+                />
+                <div className="flex flex-col text-left w-full">
+                  <span className="font-semibold text-xs md:text-sm">
+                    {song.name}
+                  </span>
+                  <span className="text-[10px] md:text-xs text-purple-500 truncate">
+                    {song.artist}
+                  </span>
+                </div>
+                <button
+                  className={
+                    isAdded
+                      ? "cursor-not-allowed bg-gray-300 text-gray-500 font-semibold px-3 md:px-4 py-1 rounded-full text-xs shadow transition whitespace-nowrap border border-gray-300 opacity-70"
+                      : "cursor-pointer bg-pink-300 hover:bg-pink-400 text-white font-semibold px-3 md:px-4 py-1 rounded-full text-xs shadow transition whitespace-nowrap"
+                  }
+                  onClick={() => !isAdded && handleAddtoPlaylist(song)}
+                  disabled={addingPlaylist || isAdded}
+                >
+                  {isAdded ? "Added" : "Add to playlist"}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
-      <div className="bg-white/80 rounded-2xl shadow-lg p-6 mb-10 border border-purple-100">
-        {error && <span className="text-red-500 mt-2 ">{error}</span>}
+      <div className="bg-white/80 rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-10 border border-purple-100 w-full md:max-w-[45%] flex flex-col items-center">
         {loadingPlaylist && (
           <div className="text-purple-400 text-center py-4">
             Loading playlist…
           </div>
         )}
         {playlist && (
-          <div className="flex flex-col items-center mt-4">
-            <span className="font-semibold text-xs md:text-xl">
+          <div className="flex flex-col md:items-center mt-2 w-full">
+            <span className="font-semibold text-xs md:text-xl text-center w-full">
               {playlist.name}
             </span>
             <img
               src={playlist.art}
               alt="Playlist cover"
-              className="w-32 h-32 rounded-xl mb-2 object-cover shadow"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-xl mb-2 object-cover shadow"
             />
-            <div className="w-full h-1/2 overflow-y-auto">
+            <div className="w-full max-h-40 md:max-h-60 overflow-y-auto">
               <ul className="divide-y divide-purple-100">
-                {playlist.tracks.map((track) => (
-                  <li
-                    key={track.id}
-                    className="py-2 flex flex-col md:flex-row md:items-center md:gap-2"
-                  >
-                    <span className="font-medium text-sm text-purple-900">
-                      {track.name}
-                    </span>
-                    <span className="text-xs text-purple-500 md:ml-2">
-                      {track.artist}
-                    </span>
-                  </li>
-                ))}
+                {playlist.tracks.map((track) => {
+                  const contributor = contributors?.find(
+                    (c) => c.track_id === track.id
+                  );
+                  return (
+                    <li key={track.id} className="p-1 flex flex-col md:gap-2 mb-2">
+                      <div className="flex justify-between">
+                        <span className="font-medium text-xs md:text-sm text-purple-900 truncate">
+                          {track.name}
+                        </span>
+                        <span className="text-[10px] md:text-xs text-purple-500 md:ml-2 truncate">
+                          {track.artist}
+                        </span>
+                      </div>
+                      {contributor && (
+                        <span className="text-[10px] md:text-xs text-pink-500 truncate font-semibold mt-0.5 capitalize">
+                          Contributed by{" "}
+                          {contributor.contributor_name.split("-").join(" ")}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>

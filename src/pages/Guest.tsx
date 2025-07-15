@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, createContext } from "react";
 import PlaylistSection from "@/components/Guest/PlaylistSection";
 import PhotoUploadSection from "@/components/Guest/PhotoUploadSection";
@@ -52,7 +53,7 @@ function Guest() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="min-h-screen bg-gradient-to-br from-pink-300 via-pink-50 to-pink-500 flex flex-col items-center px-36"
+            className="min-h-screen bg-gradient-to-br from-pink-300 via-pink-50 to-pink-500 flex flex-col items-center px-2 sm:px-6 md:px-12 lg:px-36"
           >
             <span className="text-xl md:text-4xl font-extrabold text-center text-[#2d1a2d] mb-2 w-full">
               Help make Preci’s day special!

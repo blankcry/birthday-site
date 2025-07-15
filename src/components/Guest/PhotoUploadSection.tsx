@@ -6,22 +6,22 @@ function PhotoUploadSection() {
   const [message, setMessage] = useState("");
   const { name } = useContext(ContributorContext);
   return (
-    <section className="bg-white/80 rounded-2xl shadow-lg flex flex-col md:flex-row gap-6 p-6 mb-10 border border-pink-100 w-full">
-      <div className="flex-1 flex flex-col items-center justify-center max-w-1/2 w-full">
+    <section className="bg-white/80 rounded-2xl shadow-lg flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 mb-6 md:mb-10 border border-pink-100 w-full">
+      <div className="flex-1 flex flex-col items-center justify-center w-full md:max-w-[50%] mb-4 md:mb-0">
         <label
           htmlFor="photo-upload"
-          className="w-full cursor-pointer flex flex-col items-center justify-center bg-teal-200 rounded-xl h-48 mb-4 border-2 border-dashed border-pink-200 hover:bg-teal-100 transition"
+          className="w-full cursor-pointer flex flex-col items-center justify-center bg-teal-200 rounded-xl h-40 md:h-48 mb-4 border-2 border-dashed border-pink-200 hover:bg-teal-100 transition"
         >
           {photo ? (
             <img
               src={URL.createObjectURL(photo)}
               alt="Preview"
-              className="object-cover h-48 w-full rounded-xl"
+              className="object-cover h-40 md:h-48 w-full rounded-xl"
             />
           ) : (
             <>
-              <span className="text-6xl mb-2">⬆️</span>
-              <span className="font-semibold text-lg text-teal-900">
+              <span className="text-5xl md:text-6xl mb-2">⬆️</span>
+              <span className="font-semibold text-base md:text-lg text-teal-900">
                 UPLOAD
               </span>
             </>
@@ -35,22 +35,22 @@ function PhotoUploadSection() {
           />
         </label>
       </div>
-      <div className="flex-1 flex flex-col justify-between gap-3">
+      <div className="flex-1 flex flex-col justify-between gap-3 w-full md:max-w-[50%]">
         <div>
           <div className="font-semibold text-lg mb-1">Share a Memory</div>
           <div className="text-sm text-[#6e4a7e] mb-2">
             Upload a photo and write a message for Preci.
           </div>
           <textarea
-            className="w-full rounded-xl border border-pink-200 bg-pink-50 p-3 mb-2 focus:outline-none focus:ring-2 focus:ring-pink-200 resize-none min-h-[80px]"
+            className="w-full rounded-xl border border-pink-200 bg-pink-50 p-2 md:p-3 mb-2 focus:outline-none focus:ring-2 focus:ring-pink-200 resize-none min-h-[60px] md:min-h-[80px] text-sm md:text-base"
             placeholder="Write your message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <div className="text-xs text-pink-700 mb-2">From: <span className="font-bold">{name}</span></div>
+          <div className="text-xs md:text-sm text-pink-700 mb-2">From: <span className="font-bold">{name}</span></div>
         </div>
         <div className="flex justify-end">
-          <button className="bg-pink-400 hover:bg-pink-500 text-white font-bold px-6 py-2 rounded-full shadow transition">
+          <button className="bg-pink-400 hover:bg-pink-500 text-white font-bold px-4 md:px-6 py-2 rounded-full shadow transition text-xs md:text-base">
             Submit
           </button>
         </div>
