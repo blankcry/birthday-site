@@ -21,9 +21,22 @@ function PhotoUploadSection() {
       .replace(/[^a-z0-9-]/g, '');
   }
 
+  // Accept both images and videos, limit to 10MB
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const ACCEPTED_TYPES = /^image\/(jpeg|png|gif|webp|jpg)$|^video\/(mp4|webm|ogg)$/;
+
   // Upload photo to Supabase Storage (only if not already uploaded)
   const uploadPhoto = async () => {
     if (!photo) return null;
+    // Validate file type and size
+    if (!ACCEPTED_TYPES.test(photo.type)) {
+      setError("Only images (jpeg, png, gif, webp) and videos (mp4, webm, ogg) are allowed.");
+      return null;
+    }
+    if (photo.size > MAX_FILE_SIZE) {
+      setError("File size must be 10MB or less.");
+      return null;
+    }
     setUploading(true);
     setError(null);
     try {
@@ -101,17 +114,28 @@ function PhotoUploadSection() {
   return (
     <section className="bg-white/80 rounded-2xl shadow-lg flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 mb-6 md:mb-10 border border-pink-100 w-full">
       <div className="flex-1 flex flex-col items-center justify-center w-full md:max-w-[50%] mb-4 md:mb-0">
+        <div className="text-xs md:text-sm text-pink-700 mb-2 text-center">
+          You can upload <span className="font-semibold">images (jpeg, png, gif, webp)</span> or <span className="font-semibold">videos (mp4, webm, ogg)</span> up to <span className="font-semibold">10MB</span>.
+        </div>
         <label
           htmlFor="photo-upload"
           className="w-[55%] cursor-pointer flex flex-col items-center justify-center bg-pink-100 rounded-xl h-40 md:h-48 mb-4 border-2 border-dashed border-pink-200 hover:bg-pink-50 transition relative"
         >
           {photo ? (
             <div className="relative w-full h-40 md:h-48 flex items-center justify-center">
-              <img
-                src={URL.createObjectURL(photo)}
-                alt="Preview"
-                className="object-cover h-40 md:h-48 w-full rounded-xl"
-              />
+              {photo.type.startsWith("video/") ? (
+                <video
+                  src={URL.createObjectURL(photo)}
+                  controls
+                  className="object-cover h-40 md:h-48 w-full rounded-xl"
+                />
+              ) : (
+                <img
+                  src={URL.createObjectURL(photo)}
+                  alt="Preview"
+                  className="object-cover h-40 md:h-48 w-full rounded-xl"
+                />
+              )}
               {uploading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl">
                   <svg className="animate-spin h-10 w-10 text-pink-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -145,13 +169,22 @@ function PhotoUploadSection() {
           <input
             id="photo-upload"
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             className="hidden"
             onChange={(e) => {
-              setPhoto(e.target.files?.[0] || null);
+              const file = e.target.files?.[0] || null;
+              setPhoto(file);
               setPhotoUrl(null);
               setSuccess(false);
               setError(null);
+              // Optionally, validate immediately
+              if (file) {
+                if (!ACCEPTED_TYPES.test(file.type)) {
+                  setError("Only images (jpeg, png, gif, webp) and videos (mp4, webm, ogg) are allowed.");
+                } else if (file.size > MAX_FILE_SIZE) {
+                  setError("File size must be 10MB or less.");
+                }
+              }
             }}
             disabled={uploading || inserting}
           />

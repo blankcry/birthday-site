@@ -18,6 +18,10 @@ interface GalleryPhoto {
   name: string;
 }
 
+function isVideo(url: string) {
+  return /\.(mp4|webm|ogg)$/i.test(url);
+}
+
 function GallerySection() {
   const { name, galleryRefresh } = useContext(GuestContext);
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
@@ -80,11 +84,22 @@ function GallerySection() {
                 photo.name === userSlug ? "ring-2 ring-pink-400" : ""
               }`}
             >
-              <img
-                src={photo.photo_url}
-                alt={photo.caption || photo.name || "Guest"}
-                className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105 border border-neutral-100"
-              />
+              {isVideo(photo.photo_url) ? (
+                <video
+                  src={photo.photo_url}
+                  autoPlay
+                  muted
+                  loop
+                  controls
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <img
+                  src={photo.photo_url}
+                  alt={photo.caption || photo.name || "Guest"}
+                  className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105 border border-neutral-100"
+                />
+              )}
               {photo.caption && (
                 <div
                   className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent text-white text-xs md:text-sm px-2 py-1
