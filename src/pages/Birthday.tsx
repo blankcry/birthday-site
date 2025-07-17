@@ -3,6 +3,7 @@ import { HeroSection } from '../components/Birthday/HeroSection';
 import { PhotoGallery } from '../components/Birthday/PhotoGallery';
 import { PersonalLetter } from '../components/Birthday/PersonalLetter';
 import { MusicSection } from '../components/Birthday/MusicSection';
+import { config } from '@/data/birthday-user';
 
 export default function Birthday() {
   return (
@@ -22,7 +23,7 @@ export default function Birthday() {
               Made with 💕 by your loving friends
             </p>
             <p className="text-sm text-gray-500">
-              Happy Birthday, Sarah! Here's to another year of amazing memories! 🎉
+              Happy Birthday, {config.name}! Here's to another year of amazing memories! 🎉
             </p>
           </div>
         </footer>
