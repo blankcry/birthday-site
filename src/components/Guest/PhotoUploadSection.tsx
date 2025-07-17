@@ -17,20 +17,23 @@ function PhotoUploadSection() {
     return str
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
   }
 
   // Accept both images and videos, limit to 10MB
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-  const ACCEPTED_TYPES = /^image\/(jpeg|png|gif|webp|jpg)$|^video\/(mp4|webm|ogg)$/;
+  const ACCEPTED_TYPES =
+    /^image\/(jpeg|png|gif|webp|jpg)$|^video\/(mp4|webm|ogg)$/;
 
   // Upload photo to Supabase Storage (only if not already uploaded)
   const uploadPhoto = async () => {
     if (!photo) return null;
     // Validate file type and size
     if (!ACCEPTED_TYPES.test(photo.type)) {
-      setError("Only images (jpeg, png, gif, webp) and videos (mp4, webm, ogg) are allowed.");
+      setError(
+        "Only images (jpeg, png, gif, webp) and videos (mp4, webm, ogg) are allowed."
+      );
       return null;
     }
     if (photo.size > MAX_FILE_SIZE) {
@@ -40,8 +43,11 @@ function PhotoUploadSection() {
     setUploading(true);
     setError(null);
     try {
-      const fileExt = photo.name.split('.').pop();
-      const generatedFileName = `${Date.now()}-${name.replace(/\s+/g, "-")}.${fileExt}`;
+      const fileExt = photo.name.split(".").pop();
+      const generatedFileName = `${Date.now()}-${name.replace(
+        /\s+/g,
+        "-"
+      )}.${fileExt}`;
       const { error: uploadError } = await supabase.storage
         .from("guestphotos")
         .upload(generatedFileName, photo, { upsert: false });
@@ -66,9 +72,9 @@ function PhotoUploadSection() {
     setError(null);
     try {
       const slug = slugify(name);
-      const { error: insertError } = await supabase.from("guest_uploads").insert([
-        { name: slug, caption: message, photo_url: url },
-      ]);
+      const { error: insertError } = await supabase
+        .from("guest_uploads")
+        .insert([{ name: slug, caption: message, photo_url: url }]);
       if (insertError) throw insertError;
       setSuccess(true);
       setPhoto(null);
@@ -115,7 +121,10 @@ function PhotoUploadSection() {
     <section className="bg-white/80 rounded-2xl shadow-lg flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 mb-6 md:mb-10 border border-pink-100 w-full">
       <div className="flex-1 flex flex-col items-center justify-center w-full md:max-w-[50%] mb-4 md:mb-0">
         <div className="text-xs md:text-sm text-pink-700 mb-2 text-center">
-          You can upload <span className="font-semibold">images (jpeg, png, gif, webp)</span> or <span className="font-semibold">videos (mp4, webm, ogg)</span> up to <span className="font-semibold">10MB</span>.
+          You can upload{" "}
+          <span className="font-semibold">images (jpeg, png, gif, webp)</span>{" "}
+          or <span className="font-semibold">videos (mp4, webm, ogg)</span> up
+          to <span className="font-semibold">10MB</span>.
         </div>
         <label
           htmlFor="photo-upload"
@@ -138,9 +147,25 @@ function PhotoUploadSection() {
               )}
               {uploading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl">
-                  <svg className="animate-spin h-10 w-10 text-pink-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  <svg
+                    className="animate-spin h-10 w-10 text-pink-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
                   </svg>
                 </div>
               )}
@@ -163,7 +188,7 @@ function PhotoUploadSection() {
               </svg>
               <span className="font-medium text-xs md:text-sm text-pink-400 tracking-wide">
                 Upload Photo
-              </span>
+              </span> 
             </>
           )}
           <input
@@ -180,7 +205,9 @@ function PhotoUploadSection() {
               // Optionally, validate immediately
               if (file) {
                 if (!ACCEPTED_TYPES.test(file.type)) {
-                  setError("Only images (jpeg, png, gif, webp) and videos (mp4, webm, ogg) are allowed.");
+                  setError(
+                    "Only images (jpeg, png, gif, webp) and videos (mp4, webm, ogg) are allowed."
+                  );
                 } else if (file.size > MAX_FILE_SIZE) {
                   setError("File size must be 10MB or less.");
                 }
@@ -203,9 +230,15 @@ function PhotoUploadSection() {
             onChange={(e) => setMessage(e.target.value)}
             disabled={uploading || inserting}
           />
-          <div className="text-xs md:text-sm text-pink-700 mb-2">From: <span className="font-bold">{name}</span></div>
+          <div className="text-xs md:text-sm text-pink-700 mb-2">
+            From: <span className="font-bold">{name}</span>
+          </div>
           {error && <div className="text-xs text-red-500 mb-2">{error}</div>}
-          {success && <div className="text-xs text-green-600 mb-2">Thank you for your contribution!</div>}
+          {success && (
+            <div className="text-xs text-green-600 mb-2">
+              Thank you for your contribution!
+            </div>
+          )}
         </div>
         <div className="flex justify-end gap-2">
           {error && photoUrl && !success && !uploading && !inserting && (
@@ -222,7 +255,7 @@ function PhotoUploadSection() {
             onClick={handleSubmit}
             disabled={uploading || inserting}
           >
-            {(uploading || inserting) ? "Submitting..." : "Submit"}
+            {uploading || inserting ? "Submitting..." : "Submit"}
           </button>
         </div>
       </div>
