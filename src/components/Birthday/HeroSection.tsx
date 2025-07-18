@@ -11,7 +11,7 @@ interface ConfettiPiece {
   size: number;
 }
 
-export function HeroSection() {
+export function HeroSection({ id }: { id?: string } = {}) {
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [storyStep, setStoryStep] = useState(0);
@@ -129,7 +129,10 @@ export function HeroSection() {
   } as Variants;
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center text-center px-4 overflow-hidden">
+    <section
+      className="relative min-h-screen flex items-center justify-center text-center px-4 overflow-hidden"
+      id={id}
+    >
       {/* Confetti */}
       {showConfetti &&
         confetti.map((piece) => (

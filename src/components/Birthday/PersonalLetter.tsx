@@ -2,7 +2,7 @@ import { config } from '@/data/birthday-user';
 import { motion, type Variants } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
-export function PersonalLetter() {
+export function PersonalLetter({ id }: { id?: string } = {}) {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
@@ -107,7 +107,7 @@ export function PersonalLetter() {
   } as Variants
 
   return (
-    <section className="relative py-20 px-4">
+    <section className="relative py-20 px-4" id={id}>
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <motion.div

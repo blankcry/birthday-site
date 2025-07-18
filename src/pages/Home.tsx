@@ -1,6 +1,6 @@
 import Countdown from "@/components/Countdown";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { loadFull } from "tsparticles";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container } from "@tsparticles/engine";
@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { particlesOptions } from "@/data/particles";
 
 function Home() {
-  const BIRTHDAY_DATE = new Date("2025-07-20T00:00:00"); // Change as needed
+  const BIRTHDAY_DATE = useMemo<Date>(() => new Date("2025-07-19T07:00:00"), []); // Change as needed
   const [init, setInit] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -18,6 +18,20 @@ function Home() {
       setInit(true);
     });
   }, []);
+
+  useEffect(() => {
+    if (BIRTHDAY_DATE < new Date()) {
+      const countdownInterval = setInterval(() => {
+        const now = new Date();
+        if (BIRTHDAY_DATE <= now) {
+          clearInterval(countdownInterval);
+          navigate("/birthday");
+        }
+      }, 1000);
+
+      return () => clearInterval(countdownInterval);
+    }
+  }, [BIRTHDAY_DATE, navigate])
 
   const particlesLoaded = async (container?: Container) => {
     console.log(container);

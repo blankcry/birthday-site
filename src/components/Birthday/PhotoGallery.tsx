@@ -20,8 +20,7 @@ interface GalleryItem {
   name: string;
 }
 
-
-export function PhotoGallery() {
+export function PhotoGallery({ id }: { id?: string } = {}) {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
@@ -129,7 +128,7 @@ export function PhotoGallery() {
   }
 
   return (
-    <section className="relative py-20 px-4">
+    <section className="relative py-20 px-4" id={id}>
       <div className="max-w-7xl mx-auto flex flex-col gap-8">
         {/* Section Header */}
         <motion.div
@@ -164,7 +163,7 @@ export function PhotoGallery() {
           <div className="flex flex-col lg:flex-row min-h-[600px]">
             {/* Media Section */}
             <motion.div
-              className="lg:w-2/3 relative overflow-hidden flex items-center justify-center"
+              className="lg:w-2/3 relative overflow-hidden flex items-center justify-center h-full"
               variants={slideInVariants}
               transition={{ delay: 0.3 }}
             >
@@ -173,7 +172,7 @@ export function PhotoGallery() {
                 style={{
                   aspectRatio: "9/16",
                   maxHeight: "80vh",
-                  minHeight: "400px",
+                  minHeight: "600px",
                 }}
               >
                 <AnimatePresence mode="wait">

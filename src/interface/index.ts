@@ -16,10 +16,12 @@ export interface PlaylistContributorI {
 export interface PlaylistI {
   name: string;
   art: string;
-  tracks: Array<{
-    name: string;
-    id: string;
-    artist: string;
-    art?: string;
-  }>;
+  tracks: Array<TracksI>;
+}
+
+export interface TracksI {
+  id: string;
+  name: string;
+  artist: string;
+  art?: string;
 }
