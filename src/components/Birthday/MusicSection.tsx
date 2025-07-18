@@ -5,6 +5,7 @@ import SpotifySDK from "@/api/spotifyClient";
 import { supabase } from "@/api/supabaseClient";
 import type { PlaylistI, PlaylistContributorI } from "@/interface";
 import { unslugify } from "@/util";
+import { useRef } from "react";
 
 export function MusicSection() {
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
@@ -14,6 +15,9 @@ export function MusicSection() {
   const [contributors, setContributors] = useState<
     PlaylistContributorI[] | null
   >(null);
+  const [spotifyController, setSpotifyController] = useState<any>(null);
+  const [embedLoaded, setEmbedLoaded] = useState(false);
+  const embedRef = useRef<HTMLDivElement>(null);
 
   const playlistId = "16EaYXNEuGo5886td84PBJ";
 
@@ -47,6 +51,48 @@ export function MusicSection() {
       console.error(error);
     }
   }, []);
+
+  // Helper to get Spotify URI for a track
+  const getTrackUri = (id: string) => `spotify:track:${id}`;
+
+  // Add Spotify iFrame API script if not present
+  useEffect(() => {
+    if (!document.getElementById("spotify-iframe-api")) {
+      const script = document.createElement("script");
+      script.id = "spotify-iframe-api";
+      script.src = "https://open.spotify.com/embed/iframe-api/v1";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  // Initialize the Spotify Embed when playlist is loaded
+  useEffect(() => {
+    if (!playlist || embedLoaded) return;
+    // Wait for the API to be ready
+    (window as any).onSpotifyIframeApiReady = (IFrameAPI: any) => {
+      const element = embedRef.current;
+      if (!element) return;
+      const options = {
+        uri: playlist.tracks[0] ? getTrackUri(playlist.tracks[0].id) : `spotify:playlist:${playlistId}`,
+        width: '100%',
+        height: 80,
+        theme: 'black',
+      };
+      IFrameAPI.createController(element, options, (controller: any) => {
+        setSpotifyController(controller);
+        setEmbedLoaded(true);
+      });
+    };
+  }, [playlist, embedLoaded]);
+
+  // When a song is clicked, switch the embed to that song
+  const handleSongClick = (songId: string) => {
+    setCurrentlyPlaying(songId);
+    if (spotifyController) {
+      spotifyController.loadUri(getTrackUri(songId));
+    }
+  };
 
   useEffect(() => {
     fetchPlaylist();
@@ -220,7 +266,7 @@ export function MusicSection() {
           </motion.p>
         </motion.div>
 
-        {/* Spotify embed placeholder */}
+        {/* Spotify embed player */}
         <motion.div
           className="mb-12"
           variants={spotifyEmbedVariants}
@@ -279,17 +325,8 @@ export function MusicSection() {
                 >
                   🎵 Available on Spotify
                 </motion.p>
-                <motion.button
-                  className="bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition-colors"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.6 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Open in Spotify
-                </motion.button>
+                {/* Embed container */}
+                <div ref={embedRef} style={{ width: '100%', minHeight: 80 }} />
               </motion.div>
               <motion.p
                 className="text-gray-600 text-sm"
@@ -298,8 +335,7 @@ export function MusicSection() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.8 }}
               >
-                * In a real implementation, this would be a Spotify playlist
-                embed
+                * Click a song below to play it in the Spotify player above
               </motion.p>
             </div>
           </div>
@@ -358,7 +394,7 @@ export function MusicSection() {
                           transition={{ delay: 0.1 }}
                         />
                         <motion.button
-                          onClick={() => togglePlay(song.id)}
+                          onClick={() => handleSongClick(song.id)}
                           className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
