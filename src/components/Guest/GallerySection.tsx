@@ -1,30 +1,15 @@
 import { useEffect, useState, useContext } from "react";
 import { supabase } from "@/api/supabaseClient";
 import { GuestContext } from "@/pages/Guest";
+import type { GuestUploads } from "@/interface";
+import { isVideo, slugify } from "@/util";
 
 // Utility to slugify contributor name (same as in PhotoUploadSection)
-function slugify(str: string) {
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-}
 
-interface GalleryPhoto {
-  id: number;
-  photo_url: string;
-  caption: string;
-  name: string;
-}
-
-function isVideo(url: string) {
-  return /\.(mp4|webm|ogg)$/i.test(url);
-}
 
 function GallerySection() {
   const { name, galleryRefresh } = useContext(GuestContext);
-  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
+  const [photos, setPhotos] = useState<GuestUploads[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const userSlug = slugify(name);

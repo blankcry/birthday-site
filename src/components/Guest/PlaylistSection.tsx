@@ -2,27 +2,14 @@ import SpotifySDK from "@/api/spotifyClient";
 import { useEffect, useRef, useState, useContext, useCallback } from "react";
 import { GuestContext } from "@/pages/Guest";
 import { supabase } from "@/api/supabaseClient";
+import type { PlaylistContributorI, PlaylistI } from "@/interface";
+import { unslugify } from "@/util";
 
-interface PlaylistContributorI {
-  track_id: string;
-  track_name: string;
-  artist_name: string;
-  album_art_url: string;
-  contributor_name: string;
-}
 
 function PlaylistSection() {
   const playlistId = "16EaYXNEuGo5886td84PBJ";
   const { name } = useContext(GuestContext);
-  const [playlist, setPlaylist] = useState<{
-    name: string;
-    art: string;
-    tracks: Array<{
-      name: string;
-      id: string;
-      artist: string;
-    }>;
-  } | null>(null);
+  const [playlist, setPlaylist] = useState<PlaylistI | null>(null);
   const [contributors, setContributors] = useState<
     PlaylistContributorI[] | null
   >(null);
@@ -232,7 +219,7 @@ function PlaylistSection() {
                       {contributor && (
                         <span className="text-[10px] md:text-xs text-pink-500 truncate font-semibold mt-0.5 capitalize">
                           Contributed by{" "}
-                          {contributor.contributor_name.split("-").join(" ")}
+                          {unslugify(contributor.contributor_name)}
                         </span>
                       )}
                     </li>
