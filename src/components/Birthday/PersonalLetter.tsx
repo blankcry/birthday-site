@@ -7,20 +7,21 @@ export function PersonalLetter() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   const letterText = config.birthdayWishes;
 
   useEffect(() => {
-    if (isInView && !isTyping) {
+    if (isInView && !isTyping && !hasAnimated) {
       const timer = setTimeout(() => {
         setIsTyping(true);
         setCurrentIndex(0);
         setDisplayText('');
+        setHasAnimated(true);
       }, 500);
-
       return () => clearTimeout(timer);
     }
-  }, [isInView, isTyping]);
+  }, [isInView, isTyping, hasAnimated]);
 
   useEffect(() => {
     if (isTyping && currentIndex < letterText.length) {
@@ -131,7 +132,9 @@ export function PersonalLetter() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-150px" }}
-          onViewportEnter={() => setIsInView(true)}
+          onViewportEnter={() => {
+            if (!hasAnimated) setIsInView(true);
+          }}
         >
           {/* Letter card */}
           <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-2xl border border-pink-200 overflow-hidden">
